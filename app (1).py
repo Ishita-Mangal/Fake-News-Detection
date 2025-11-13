@@ -24,6 +24,13 @@ except LookupError:
     nltk.download('stopwords')
     stop_words = set(stopwords.words('english'))
 
+# tokenizers
+for pkg in ["punkt", "punkt_tab"]:
+    try:
+        nltk.data.find(f"tokenizers/{pkg}")
+    except LookupError:
+        nltk.download(pkg)
+
 stemmer = PorterStemmer()
 def preprocess_text(text):
     text = text.lower()
@@ -52,5 +59,6 @@ if st.button("Predict"):
         vectorized = vectorizer.transform([clean_text])
         prediction = model.predict(vectorized)[0]
         st.success(f"Prediction: **{prediction}** (1 = Real disaster, 0 = Not disaster)")
+
 
 
