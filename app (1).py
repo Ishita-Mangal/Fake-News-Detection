@@ -15,9 +15,15 @@ with open('tfidf_vectorizer.pkl', 'rb') as f:
     vectorizer = pickle.load(f)
 
 # Preprocessing function
-stop_words = set(stopwords.words('english'))
-stemmer = PorterStemmer()
+# stop_words = set(stopwords.words('english'))
 
+try:
+    stop_words = set(stopwords.words('english'))
+except LookupError:
+    nltk.download('stopwords')
+    stop_words = set(stopwords.words('english'))
+
+stemmer = PorterStemmer()
 def preprocess_text(text):
     text = text.lower()
     text = re.sub(r"http\S+|www\S+", "", text)
@@ -45,3 +51,4 @@ if st.button("Predict"):
         vectorized = vectorizer.transform([clean_text])
         prediction = model.predict(vectorized)[0]
         st.success(f"Prediction: **{prediction}** (1 = Real disaster, 0 = Not disaster)")
+
