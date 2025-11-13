@@ -3,6 +3,7 @@ import streamlit as st
 import pickle
 import re
 import string
+import nltk
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
@@ -51,4 +52,5 @@ if st.button("Predict"):
         vectorized = vectorizer.transform([clean_text])
         prediction = model.predict(vectorized)[0]
         st.success(f"Prediction: **{prediction}** (1 = Real disaster, 0 = Not disaster)")
+
 
