@@ -1,14 +1,18 @@
 import streamlit as st
-from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 import torch.nn.functional as F
+
+# ----------- HF Model Path -----------
+# Replace this with your actual Hugging Face repo name
+HF_MODEL_PATH = "ishita-mangal/fake-news-transformer-model"
+
 
 # ----------- Load Model + Tokenizer -----------
 @st.cache_resource
 def load_model():
-    model_path = "saved_model"
-    tokenizer = DistilBertTokenizer.from_pretrained(model_path)
-    model = DistilBertForSequenceClassification.from_pretrained(model_path)
+    tokenizer = AutoTokenizer.from_pretrained(HF_MODEL_PATH)
+    model = AutoModelForSequenceClassification.from_pretrained(HF_MODEL_PATH)
     model.eval()
     return tokenizer, model
 
@@ -22,10 +26,12 @@ def classify_news(text, tokenizer, model):
         outputs = model(**inputs)
         probs = F.softmax(outputs.logits, dim=1)
         confidence, predicted_class = torch.max(probs, dim=1)
+    
     label_map = {0: "Fake", 1: "True"}
     label = label_map[predicted_class.item()]
     confidence_percent = confidence.item() * 100
     return label, confidence_percent
+
 
 # ----------- Page Config -----------
 st.set_page_config(page_title="Fake News Chatbot", page_icon="🔍", layout="wide")
@@ -53,11 +59,11 @@ if st.button("🔍 Analyze"):
     else:
         label, confidence = classify_news(user_input, tokenizer, model)
         if label == "Fake":
-            st.error(f"This news is likely FAKE.\n\nConfidence: `{confidence:.2f}%`. You better check your sources.")
+            st.error(f"This news is likely FAKE.\n\nConfidence: `{confidence:.2f}%`.\nBetter double-check your sources.")
         else:
             st.success(f"This news is likely TRUE.\n\nConfidence: `{confidence:.2f}%`")
 
-# Footer
+# ----------- Footer -----------
 st.markdown("""
 <div style='text-align: center;'>
     Model fine-tuned using DistilBERT on real/fake news. | 
